@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-
+ 
 :root{
   --bg:#f5f0e8;
   --surface:#ffffff;
@@ -29,7 +29,7 @@
   --font-display:'Unbounded',sans-serif;
   --font-body:'Inter',sans-serif;
 }
-
+ 
 [data-theme="dark"]{
   --bg:#1a1814;
   --surface:#252320;
@@ -43,7 +43,7 @@
   --header-bg:#1f1c18;
   --shadow:0 2px 8px rgba(0,0,0,0.3);
 }
-
+ 
 body{
   font-family:var(--font-body);
   background:var(--bg);
@@ -53,7 +53,7 @@ body{
   flex-direction:column;
   transition:background 0.3s,color 0.3s;
 }
-
+ 
 /* HEADER */
 header{
   background:var(--header-bg);
@@ -82,11 +82,11 @@ header{
   line-height:1;
 }
 .icon-btn:hover{background:var(--key-bg);color:var(--text)}
-
+ 
 /* SCREENS */
 .screen{display:none;flex-direction:column;align-items:center;flex:1;padding:24px 16px}
 .screen.active{display:flex}
-
+ 
 /* SETUP SCREEN */
 .setup-card{
   background:var(--surface);
@@ -146,14 +146,26 @@ header{
 .play-btn:hover{opacity:0.85}
 .play-btn:active{transform:scale(0.98)}
 .play-btn:disabled{opacity:0.4;cursor:not-allowed}
-
+ 
 /* GAME SCREEN */
-#game-screen{justify-content:flex-start;gap:0;padding:0}
+#game-screen{
+  justify-content:flex-start;
+  gap:0;
+  padding:0;
+  flex:1;
+  overflow:hidden;
+  display:none;
+  flex-direction:column;
+  align-items:center;
+}
+#game-screen.active{display:flex}
 .game-inner{
   width:100%;max-width:500px;
   display:flex;flex-direction:column;
   align-items:center;padding:16px;gap:12px;
   flex:1;
+  min-height:0;
+  overflow:hidden;
 }
 .game-meta{
   width:100%;
@@ -170,7 +182,7 @@ header{
   letter-spacing:0.3px;
 }
 .small-btn:hover{background:var(--key-bg)}
-
+ 
 /* GRID */
 #grid-container{display:flex;justify-content:center;width:100%}
 #grid{display:flex;flex-direction:column;gap:5px}
@@ -213,7 +225,7 @@ header{
   10%,30%,50%,70%,90%{transform:translateX(-4px)}
   20%,40%,60%,80%{transform:translateX(4px)}
 }
-
+ 
 /* TOAST */
 #toast-container{
   position:fixed;top:64px;left:50%;transform:translateX(-50%);
@@ -230,7 +242,7 @@ header{
   white-space:nowrap;
 }
 .toast.show{opacity:1;transform:translateY(0)}
-
+ 
 /* KEYBOARD */
 #keyboard{width:100%;max-width:500px;padding:0 4px}
 .kb-row{display:flex;justify-content:center;gap:5px;margin-bottom:5px}
@@ -256,7 +268,7 @@ header{
 .key.correct{background:var(--correct)!important;color:#fff!important}
 .key.present{background:var(--present)!important;color:#fff!important}
 .key.absent{background:var(--absent-key)!important;color:#fff!important}
-
+ 
 /* MODAL */
 .modal-overlay{
   display:none;position:fixed;inset:0;
@@ -320,7 +332,7 @@ header{
   line-height:1.5;margin:12px 0;
   word-break:break-all;
 }
-
+ 
 /* STATS SCREEN */
 #stats-screen{padding:24px 16px}
 .stats-page{max-width:380px;width:100%}
@@ -335,21 +347,235 @@ header{
 .dist-bar-wrap{flex:1;background:var(--key-bg);border-radius:3px;overflow:hidden}
 .dist-bar{height:20px;background:var(--correct);border-radius:3px;display:flex;align-items:center;padding-left:6px;font-size:11px;font-weight:600;color:#fff;min-width:24px;transition:width 0.5s ease}
 .dist-num{width:16px;text-align:right;font-weight:600;font-size:13px}
-
-/* RESPONSIVE */
-@media(max-width:400px){
-  .cell{width:44px;height:44px;font-size:17px}
-  .key{height:48px;font-size:11px}
-  .setup-card{padding:20px}
+ 
+/* ═══════════════════════════════════════════════
+   RESPONSIVE — полная адаптивность
+═══════════════════════════════════════════════ */
+ 
+/* ── Базовые переменные размеров ── */
+:root {
+  --cell-size: 52px;
+  --cell-font: 20px;
+  --cell-gap: 5px;
+  --key-height: 56px;
+  --key-font: 12px;
+  --key-gap: 5px;
+  --key-min-w: 32px;
+  --key-wide-max: 66px;
+  --game-padding: 16px;
 }
-@media(max-width:340px){
-  .cell{width:38px;height:38px;font-size:15px}
-  .key{min-width:26px;font-size:10px}
+ 
+/* ── Игровой экран — flex-колонка на всю высоту ── */
+#game-screen {
+  flex: 1;
+  overflow: hidden;
 }
+ 
+.game-inner {
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+ 
+/* ── Клавиатура всегда внизу ── */
+#keyboard {
+  width: 100%;
+  max-width: 520px;
+  padding: 0 4px 4px;
+  flex-shrink: 0;
+}
+ 
+/* ══════════════════════════════
+   ПЛАНШЕТ — 600–900px
+══════════════════════════════ */
+@media (min-width: 600px) {
+  :root {
+    --cell-size: 60px;
+    --cell-font: 24px;
+    --cell-gap: 6px;
+    --key-height: 60px;
+    --key-font: 13px;
+    --key-gap: 6px;
+    --key-min-w: 38px;
+    --key-wide-max: 76px;
+    --game-padding: 20px;
+  }
+  .setup-card { padding: 40px; max-width: 480px; }
+  .modal { max-width: 440px; }
+  #keyboard { max-width: 580px; }
+  .game-inner { max-width: 560px; }
+  header { height: 58px; padding: 0 24px; }
+  .logo { font-size: 20px; }
+  .icon-btn { font-size: 20px; padding: 8px; }
+}
+ 
+/* ══════════════════════════════
+   ДЕСКТОП — 900px+
+══════════════════════════════ */
+@media (min-width: 900px) {
+  :root {
+    --cell-size: 64px;
+    --cell-font: 26px;
+    --cell-gap: 6px;
+    --key-height: 62px;
+    --key-font: 14px;
+    --key-gap: 6px;
+    --key-min-w: 42px;
+    --key-wide-max: 80px;
+    --game-padding: 24px;
+  }
+  .game-inner { max-width: 600px; }
+  #keyboard { max-width: 600px; }
+  header { height: 60px; padding: 0 32px; }
+}
+ 
+/* Применяем CSS-переменные к ячейкам и клавишам */
+.cell {
+  width: var(--cell-size);
+  height: var(--cell-size);
+  font-size: var(--cell-font);
+}
+#grid { gap: var(--cell-gap); }
+.row { gap: var(--cell-gap); }
+.key {
+  height: var(--key-height);
+  min-width: var(--key-min-w);
+  font-size: var(--key-font);
+}
+.key.wide { max-width: var(--key-wide-max); }
+.kb-row { gap: var(--key-gap); margin-bottom: var(--key-gap); }
+.game-inner { padding: var(--game-padding); }
+ 
+/* ══════════════════════════════
+   МАЛЕНЬКИЕ ТЕЛЕФОНЫ — до 400px
+══════════════════════════════ */
+@media (max-width: 400px) {
+  :root {
+    --cell-size: 46px;
+    --cell-font: 18px;
+    --cell-gap: 4px;
+    --key-height: 50px;
+    --key-font: 11px;
+    --key-gap: 4px;
+    --key-min-w: 28px;
+    --key-wide-max: 58px;
+    --game-padding: 10px;
+  }
+  .setup-card { padding: 20px 16px; border-radius: 12px; }
+  .setup-title { font-size: 18px; }
+  .logo { font-size: 15px; }
+  header { height: 48px; padding: 0 10px; }
+  .icon-btn { font-size: 16px; padding: 5px; }
+  .header-actions { gap: 4px; }
+  .small-btn { font-size: 10px; padding: 4px 8px; }
+  .meta-info { font-size: 11px; }
+}
+ 
+/* ══════════════════════════════
+   ОЧЕНЬ МАЛЕНЬКИЕ — до 360px
+══════════════════════════════ */
+@media (max-width: 360px) {
+  :root {
+    --cell-size: 40px;
+    --cell-font: 16px;
+    --cell-gap: 3px;
+    --key-height: 46px;
+    --key-font: 10px;
+    --key-gap: 3px;
+    --key-min-w: 24px;
+    --key-wide-max: 50px;
+    --game-padding: 8px;
+  }
+  .logo { font-size: 13px; letter-spacing: 0; }
+  header { height: 44px; padding: 0 8px; }
+  .icon-btn { font-size: 14px; padding: 4px; }
+  .header-actions { gap: 2px; }
+  .setup-card { padding: 16px 12px; }
+  .setup-title { font-size: 16px; }
+  .setup-sub { font-size: 12px; margin-bottom: 20px; }
+  .setup-section { margin-bottom: 18px; }
+  .opt-btn { padding: 8px 4px; font-size: 11px; }
+}
+ 
+/* ══════════════════════════════
+   ДИНАМИЧЕСКИЙ РАЗМЕР ЯЧЕЕК
+   Для длинных слов на маленьких экранах
+══════════════════════════════ */
+/* Когда слово 6 букв — уменьшаем ячейки на мобиле */
+@media (max-width: 440px) {
+  #grid[data-len="6"] .cell { --cell-size: 42px; width: 42px; height: 42px; font-size: 16px; }
+  #grid[data-len="6"] { gap: 3px; }
+  #grid[data-len="6"] .row { gap: 3px; }
+  #grid[data-len="5"] .cell { --cell-size: 46px; width: 46px; height: 46px; }
+}
+@media (max-width: 360px) {
+  #grid[data-len="6"] .cell { width: 36px; height: 36px; font-size: 14px; }
+  #grid[data-len="5"] .cell { width: 40px; height: 40px; font-size: 16px; }
+  #grid[data-len="4"] .cell { width: 44px; height: 44px; font-size: 17px; }
+}
+ 
+/* ══════════════════════════════
+   ВЫСОТА ЭКРАНА — для компактных
+   телефонов (iPhone SE etc.)
+══════════════════════════════ */
+@media (max-height: 680px) {
+  :root { --cell-size: 44px; --cell-font: 17px; --key-height: 46px; }
+  .game-inner { gap: 8px; padding: 8px 12px; }
+  header { height: 46px; }
+  .meta-info { font-size: 11px; }
+}
+@media (max-height: 600px) {
+  :root { --cell-size: 38px; --cell-font: 15px; --key-height: 40px; --key-font: 10px; --cell-gap: 3px; --key-gap: 3px; }
+  .game-inner { gap: 6px; padding: 6px 10px; }
+  header { height: 42px; }
+}
+ 
+/* ══════════════════════════════
+   МОДАЛКИ — адаптив
+══════════════════════════════ */
+@media (max-width: 400px) {
+  .modal {
+    padding: 20px 16px;
+    border-radius: 12px;
+    max-width: calc(100vw - 24px);
+  }
+  .modal-title { font-size: 16px; }
+  .modal-word { font-size: 20px; }
+  .stat-num { font-size: 17px; }
+  .modal-btn { font-size: 11px; padding: 10px 6px; }
+  .share-result { font-size: 18px; }
+}
+ 
+/* ══════════════════════════════
+   SETUP — адаптив кнопок опций
+══════════════════════════════ */
+@media (max-width: 360px) {
+  .option-grid.cols-5 { grid-template-columns: repeat(5, 1fr); gap: 4px; }
+  .option-grid.cols-3 { grid-template-columns: repeat(3, 1fr); gap: 4px; }
+  .opt-btn { padding: 7px 2px; font-size: 10px; }
+}
+ 
+/* ══════════════════════════════
+   ШИРОКИЕ ЭКРАНЫ — центровка
+══════════════════════════════ */
+@media (min-width: 1200px) {
+  :root {
+    --cell-size: 68px;
+    --cell-font: 28px;
+    --key-height: 66px;
+    --key-font: 15px;
+    --key-min-w: 44px;
+  }
+}
+ 
+/* Предотвращаем горизонтальный скролл */
+body { overflow-x: hidden; }
+html { overflow-x: hidden; }
+ 
 </style>
 </head>
 <body>
-
+ 
 <header>
   <span class="logo" id="header-title">🟩 СӨЗЖҰМБАҚ</span>
   <div class="header-actions">
@@ -359,15 +585,15 @@ header{
     <button class="icon-btn" id="btn-settings" title="Настройки">⚙️</button>
   </div>
 </header>
-
+ 
 <div id="toast-container"></div>
-
+ 
 <!-- SETUP SCREEN -->
 <div class="screen active" id="setup-screen">
   <div class="setup-card">
     <div class="setup-title">Выберите параметры</div>
     <div class="setup-sub">Угадайте скрытое слово за ограниченное число попыток</div>
-
+ 
     <div class="setup-section">
       <div class="setup-label">🌐 Язык</div>
       <div class="option-grid cols-3">
@@ -376,7 +602,7 @@ header{
         <button class="opt-btn" data-group="lang" data-val="en">🇬🇧 English</button>
       </div>
     </div>
-
+ 
     <div class="setup-section">
       <div class="setup-label">📏 Длина слова</div>
       <div class="option-grid cols-5">
@@ -387,7 +613,7 @@ header{
         <button class="opt-btn" data-group="len" data-val="6">6+ <span style="font-size:10px;display:block;color:inherit;opacity:.7">сложно</span></button>
       </div>
     </div>
-
+ 
     <div class="setup-section">
       <div class="setup-label">⚡ Режим</div>
       <div class="option-grid cols-3" style="grid-template-columns:1fr 1fr">
@@ -395,11 +621,11 @@ header{
         <button class="opt-btn" data-group="mode" data-val="daily">📅 Ежедневное</button>
       </div>
     </div>
-
+ 
     <button class="play-btn" id="btn-play">НАЧАТЬ ИГРУ →</button>
   </div>
 </div>
-
+ 
 <!-- GAME SCREEN -->
 <div class="screen" id="game-screen">
   <div class="game-inner">
@@ -415,7 +641,7 @@ header{
   <div id="keyboard"></div>
   <div style="height:12px"></div>
 </div>
-
+ 
 <!-- STATS SCREEN -->
 <div class="screen" id="stats-screen">
   <div class="stats-page">
@@ -430,7 +656,7 @@ header{
     </div>
   </div>
 </div>
-
+ 
 <!-- RESULT MODAL -->
 <div class="modal-overlay" id="result-modal">
   <div class="modal">
@@ -445,7 +671,7 @@ header{
     </div>
   </div>
 </div>
-
+ 
 <!-- HELP MODAL -->
 <div class="modal-overlay" id="help-modal">
   <div class="modal">
@@ -469,7 +695,7 @@ header{
     <p style="font-size:12px;color:var(--text-muted);margin-top:16px">💡 Подсказка доступна 1 раз за игру — открывает одну правильную букву</p>
   </div>
 </div>
-
+ 
 <script>
 // ═══════════════════════════════════════════════
 // DICTIONARIES
@@ -497,7 +723,7 @@ const WORDS = {
     6: ["адамдар","берікте","гүлдену","дербестік","елдіктеп","жигіттей","зерделік","кенттен","лекциясы","мамырлық","наркомату","обалымен","паркомена","рқандының","саясатты","террагана","ұжымдарды","фонтандар","хауаңның","шарыңның","ынтаңның","іштеңнің","үдеренен","алқаптың","бекпентен","гектарлар","денталдар","емілдіктер","жазасынан","занадының","кеспентен","лестінен","малшынның","наржомдар","орданының","паспортты","рқшасынан","сатпентен","теспентен","ұшқашыны","фотоңдар","хоросодар","шатпентен","ыштасынан","іждедіктен","үйленіктен"]
   }
 };
-
+ 
 // Keyboard layouts per language
 const KEYBOARDS = {
   ru: [
@@ -516,7 +742,7 @@ const KEYBOARDS = {
     ['ENTER','я','ч','с','м','и','т','ь','б','ю','ү','қ','ә','ö','ı','⌫']
   ]
 };
-
+ 
 // UI text translations
 const UI = {
   ru: {
@@ -565,7 +791,7 @@ const UI = {
     random:"Кездейсоқ сөз",
   }
 };
-
+ 
 // ═══════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════
@@ -583,7 +809,7 @@ let state = {
   stats: {},
   shareEmojis: []
 };
-
+ 
 function loadState() {
   try {
     const saved = localStorage.getItem('wordle_v2');
@@ -609,7 +835,7 @@ function loadState() {
     }
   } catch(e) {}
 }
-
+ 
 function saveState() {
   try {
     localStorage.setItem('wordle_v2', JSON.stringify({
@@ -624,7 +850,7 @@ function saveState() {
     }));
   } catch(e) {}
 }
-
+ 
 function getStats(lang, len) {
   const key = `${lang}_${len}`;
   if (!state.stats[key]) {
@@ -632,7 +858,7 @@ function getStats(lang, len) {
   }
   return state.stats[key];
 }
-
+ 
 // ═══════════════════════════════════════════════
 // GAME LOGIC
 // ═══════════════════════════════════════════════
@@ -640,20 +866,20 @@ function getWordList(lang, len) {
   const key = len >= 6 ? 6 : len;
   return WORDS[lang]?.[key] || WORDS[lang]?.[5] || [];
 }
-
+ 
 function getAttemptsForLen(len) {
   if (len <= 3) return 4;
   if (len <= 5) return 6;
   return len <= 7 ? 7 : 8;
 }
-
+ 
 function getDailyWord(lang, len) {
   const list = getWordList(lang, len);
   if (!list.length) return null;
   const day = Math.floor(Date.now() / 86400000);
   return list[day % list.length];
 }
-
+ 
 function getRandomWord(lang, len) {
   const list = getWordList(lang, len);
   if (!list.length) return null;
@@ -661,14 +887,14 @@ function getRandomWord(lang, len) {
   const pool = available.length ? available : list;
   return pool[Math.floor(Math.random() * pool.length)];
 }
-
+ 
 function isValidWord(word, lang, len) {
   const list = getWordList(lang, len);
   // Accept any word that is correct length (flexible for kz)
   if (word.length !== len) return false;
   return list.includes(word.toLowerCase()) || lang === 'kz'; // kz dictionary limited
 }
-
+ 
 // Core Wordle algorithm - handles duplicate letters correctly
 function checkGuess(guess, target) {
   const result = Array(target.length).fill('absent');
@@ -676,7 +902,7 @@ function checkGuess(guess, target) {
   const guessArr = guess.split('');
   const targetUsed = Array(target.length).fill(false);
   const guessUsed = Array(target.length).fill(false);
-
+ 
   // Pass 1: correct positions (green)
   for (let i = 0; i < target.length; i++) {
     if (guessArr[i] === targetArr[i]) {
@@ -685,7 +911,7 @@ function checkGuess(guess, target) {
       guessUsed[i] = true;
     }
   }
-
+ 
   // Pass 2: present but wrong position (yellow)
   for (let i = 0; i < guess.length; i++) {
     if (guessUsed[i]) continue;
@@ -697,10 +923,10 @@ function checkGuess(guess, target) {
       }
     }
   }
-
+ 
   return result;
 }
-
+ 
 // ═══════════════════════════════════════════════
 // UI RENDERING
 // ═══════════════════════════════════════════════
@@ -709,11 +935,11 @@ function showScreen(id) {
   document.getElementById(id).classList.add('active');
   if (id === 'stats-screen') renderStatsPage();
 }
-
+ 
 function closeModal(id) {
   document.getElementById(id).classList.remove('open');
 }
-
+ 
 function showToast(msg, duration = 1800) {
   const c = document.getElementById('toast-container');
   const t = document.createElement('div');
@@ -728,18 +954,33 @@ function showToast(msg, duration = 1800) {
     setTimeout(() => t.remove(), 300);
   }, duration);
 }
-
+ 
 function updateHeaderTitle() {
   document.getElementById('header-title').textContent = UI[state.lang].title;
 }
-
+ 
 function buildGrid() {
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
   const len = state.wordLen;
   const attempts = state.maxAttempts;
-  const cellSize = Math.min(52, Math.floor((Math.min(window.innerWidth, 500) - 32 - (len-1)*5) / len));
-
+ 
+  // Помечаем grid для CSS-адаптации по длине слова
+  grid.setAttribute('data-len', len);
+ 
+  // Умный расчёт размера ячейки под любой экран
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const headerH = 60, metaH = 44, kbH = Math.min(190, vh * 0.29), spacer = 36;
+  const pad = vw < 380 ? 20 : vw < 600 ? 32 : 48;
+  const gap = vw < 360 ? 3 : 4;
+  const availW = Math.min(vw - pad, 540);
+  const availH = vh - headerH - metaH - kbH - spacer;
+  const byW = Math.floor((availW - gap * (len - 1)) / len);
+  const byH = Math.floor((availH - gap * (attempts - 1)) / attempts);
+  const maxCell = vw < 380 ? 52 : vw < 600 ? 58 : vw < 900 ? 64 : 68;
+  const cellSize = Math.max(32, Math.min(byW, byH, maxCell));
+ 
   for (let r = 0; r < attempts; r++) {
     const row = document.createElement('div');
     row.className = 'row';
@@ -750,13 +991,13 @@ function buildGrid() {
       cell.id = `cell-${r}-${c}`;
       cell.style.width = cellSize + 'px';
       cell.style.height = cellSize + 'px';
-      cell.style.fontSize = Math.max(13, Math.floor(cellSize * 0.42)) + 'px';
+      cell.style.fontSize = Math.max(12, Math.floor(cellSize * 0.42)) + 'px';
       row.appendChild(cell);
     }
     grid.appendChild(row);
   }
 }
-
+ 
 function restoreGrid() {
   for (let r = 0; r < state.guesses.length; r++) {
     const guess = state.guesses[r].guess;
@@ -772,7 +1013,7 @@ function restoreGrid() {
   updateKeyboard();
   updateMeta();
 }
-
+ 
 function buildKeyboard() {
   const kb = document.getElementById('keyboard');
   kb.innerHTML = '';
@@ -792,7 +1033,7 @@ function buildKeyboard() {
     kb.appendChild(rowEl);
   });
 }
-
+ 
 function updateKeyboard() {
   const keyStates = {};
   state.guesses.forEach(g => {
@@ -810,7 +1051,7 @@ function updateKeyboard() {
     }
   });
 }
-
+ 
 function updateCurrentRow() {
   const r = state.guesses.length;
   for (let c = 0; c < state.wordLen; c++) {
@@ -821,39 +1062,39 @@ function updateCurrentRow() {
     cell.className = 'cell' + (ch ? ' filled' : '') + (c < state.currentGuess.length ? ' active-row' : '');
   }
 }
-
+ 
 function updateMeta() {
   const ui = UI[state.lang];
   const row = state.guesses.length + (state.gameOver ? 0 : 0);
   document.getElementById('meta-info').textContent =
     `${ui.attempt} ${Math.min(state.guesses.length + 1, state.maxAttempts)} ${ui.of} ${state.maxAttempts} · ${state.wordLen} ${state.lang === 'en' ? 'letters' : 'букв'}`;
 }
-
+ 
 // ═══════════════════════════════════════════════
 // INPUT HANDLING
 // ═══════════════════════════════════════════════
 function handleKey(key) {
   if (state.gameOver) return;
   const k = key.toLowerCase();
-
+ 
   if (k === '⌫' || k === 'backspace') {
     state.currentGuess = state.currentGuess.slice(0, -1);
     updateCurrentRow();
     return;
   }
-
+ 
   if (k === 'enter') {
     submitGuess();
     return;
   }
-
+ 
   // Accept letter keys
   if (k.length === 1 && state.currentGuess.length < state.wordLen) {
     state.currentGuess += k;
     updateCurrentRow();
   }
 }
-
+ 
 document.addEventListener('keydown', e => {
   if (document.querySelector('.modal-overlay.open')) return;
   if (e.ctrlKey || e.altKey || e.metaKey) return;
@@ -861,35 +1102,35 @@ document.addEventListener('keydown', e => {
   else if (e.key === 'Enter') handleKey('enter');
   else if (e.key.length === 1) handleKey(e.key.toLowerCase());
 });
-
+ 
 function submitGuess() {
   const guess = state.currentGuess.toLowerCase();
   const ui = UI[state.lang];
-
+ 
   if (guess.length < state.wordLen) {
     showToast(ui.short);
     shakeRow(state.guesses.length);
     return;
   }
-
+ 
   if (!isValidWord(guess, state.lang, state.wordLen)) {
     showToast(ui.notWord);
     shakeRow(state.guesses.length);
     return;
   }
-
+ 
   const result = checkGuess(guess, state.word);
   const emojiMap = {correct:'🟩', present:'🟨', absent:'⬛'};
   const emojiRow = result.map(r => emojiMap[r]).join('');
   state.shareEmojis.push(emojiRow);
   state.guesses.push({ guess, result });
   state.currentGuess = '';
-
+ 
   flipRow(state.guesses.length - 1, guess, result, () => {
     updateKeyboard();
     updateMeta();
     saveState();
-
+ 
     const won = result.every(r => r === 'correct');
     if (won) {
       endGame(true);
@@ -898,7 +1139,7 @@ function submitGuess() {
     }
   });
 }
-
+ 
 function shakeRow(r) {
   const row = document.getElementById(`row-${r}`);
   if (!row) return;
@@ -907,7 +1148,7 @@ function shakeRow(r) {
     c.addEventListener('animationend', () => c.classList.remove('shake'), {once:true});
   });
 }
-
+ 
 function flipRow(r, guess, result, cb) {
   const cells = document.querySelectorAll(`#row-${r} .cell`);
   const delays = ['','flip-delay-1','flip-delay-2','flip-delay-3','flip-delay-4','flip-delay-5','flip-delay-6'];
@@ -922,7 +1163,7 @@ function flipRow(r, guess, result, cb) {
   const total = (cells.length - 1) * 100 + 500;
   setTimeout(cb, total + 50);
 }
-
+ 
 // ═══════════════════════════════════════════════
 // GAME END & MODAL
 // ═══════════════════════════════════════════════
@@ -940,21 +1181,21 @@ function endGame(won) {
     st.streak = 0;
   }
   saveState();
-
+ 
   setTimeout(() => showResultModal(won), 400);
 }
-
+ 
 function showResultModal(won) {
   const ui = UI[state.lang];
   const st = getStats(state.lang, state.wordLen);
   const numG = state.guesses.length;
-
+ 
   document.getElementById('modal-title').textContent = won
     ? (ui.win[Math.min(numG-1, ui.win.length-1)])
     : ui.lose;
   document.getElementById('modal-word').textContent = state.word.toUpperCase();
   document.getElementById('share-emojis').textContent = state.shareEmojis.join('\n');
-
+ 
   const pct = st.games ? Math.round(st.wins / st.games * 100) : 0;
   document.getElementById('modal-stats').innerHTML = `
     <div class="stat-box"><div class="stat-num">${st.games}</div><div class="stat-label">${state.lang === 'en' ? 'Played' : 'Игр'}</div></div>
@@ -962,10 +1203,10 @@ function showResultModal(won) {
     <div class="stat-box"><div class="stat-num">${st.streak}</div><div class="stat-label">${state.lang === 'en' ? 'Streak' : 'Серия'}</div></div>
     <div class="stat-box"><div class="stat-num">${st.maxStreak}</div><div class="stat-label">${state.lang === 'en' ? 'Max' : 'Макс'}</div></div>
   `;
-
+ 
   document.getElementById('result-modal').classList.add('open');
 }
-
+ 
 function newGame() {
   closeModal('result-modal');
   if (state.word) state.usedWords.push(state.word);
@@ -977,7 +1218,7 @@ function newGame() {
   state.shareEmojis = [];
   startGame();
 }
-
+ 
 function shareResult() {
   const ui = UI[state.lang];
   const header = `${ui.title} ${state.wordLen} · ${state.guesses.length}/${state.maxAttempts}`;
@@ -988,7 +1229,7 @@ function shareResult() {
     showToast(ui.share);
   }
 }
-
+ 
 // ═══════════════════════════════════════════════
 // HINT
 // ═══════════════════════════════════════════════
@@ -996,19 +1237,19 @@ function useHint() {
   if (state.gameOver) return;
   const ui = UI[state.lang];
   if (state.hintUsed) { showToast(ui.hintUsed); return; }
-
+ 
   const knownPositions = new Set();
   state.guesses.forEach(g => {
     g.result.forEach((r, i) => {
       if (r === 'correct') knownPositions.add(i);
     });
   });
-
+ 
   const available = [];
   for (let i = 0; i < state.word.length; i++) {
     if (!knownPositions.has(i)) available.push(i);
   }
-
+ 
   if (!available.length) return;
   const pos = available[Math.floor(Math.random() * available.length)];
   const r = state.guesses.length;
@@ -1018,7 +1259,7 @@ function useHint() {
     cell.style.background = 'var(--present)';
     cell.style.color = '#fff';
     cell.style.border = 'none';
-
+ 
     if (pos < state.currentGuess.length) {
       const arr = state.currentGuess.split('');
       arr[pos] = state.word[pos];
@@ -1030,12 +1271,12 @@ function useHint() {
       }
     }
   }
-
+ 
   state.hintUsed = true;
   showToast(ui.hint);
   saveState();
 }
-
+ 
 // ═══════════════════════════════════════════════
 // STATS PAGE
 // ═══════════════════════════════════════════════
@@ -1048,7 +1289,7 @@ function renderStatsPage() {
     <div class="stat-box"><div class="stat-num">${st.streak}</div><div class="stat-label">${state.lang === 'en' ? 'Streak' : 'Серия'}</div></div>
     <div class="stat-box"><div class="stat-num">${st.maxStreak}</div><div class="stat-label">${state.lang === 'en' ? 'Max' : 'Макс'}</div></div>
   `;
-
+ 
   const maxVal = Math.max(1, ...Object.values(st.dist));
   const distEl = document.getElementById('dist-display');
   distEl.innerHTML = '';
@@ -1064,24 +1305,24 @@ function renderStatsPage() {
       </div>`;
   }
 }
-
+ 
 // ═══════════════════════════════════════════════
 // START GAME
 // ═══════════════════════════════════════════════
 function startGame() {
   state.maxAttempts = getAttemptsForLen(state.wordLen);
-
+ 
   if (!state.word) {
     state.word = state.mode === 'daily'
       ? getDailyWord(state.lang, state.wordLen)
       : getRandomWord(state.lang, state.wordLen);
   }
-
+ 
   if (!state.word) {
     showToast('Словарь недоступен для этой длины');
     return;
   }
-
+ 
   updateHeaderTitle();
   showScreen('game-screen');
   buildGrid();
@@ -1089,13 +1330,13 @@ function startGame() {
   restoreGrid();
   updateCurrentRow();
   saveState();
-
+ 
   // Resume if game over
   if (state.gameOver) {
     setTimeout(() => showResultModal(state.guesses.some(g => g.result.every(r => r === 'correct'))), 500);
   }
 }
-
+ 
 // ═══════════════════════════════════════════════
 // SETUP SCREEN LOGIC
 // ═══════════════════════════════════════════════
@@ -1110,7 +1351,7 @@ document.querySelectorAll('.opt-btn').forEach(btn => {
     if (group === 'mode') state.mode = val;
   });
 });
-
+ 
 document.getElementById('btn-play').addEventListener('click', () => {
   // Reset game for new settings
   state.word = '';
@@ -1121,7 +1362,7 @@ document.getElementById('btn-play').addEventListener('click', () => {
   state.shareEmojis = [];
   startGame();
 });
-
+ 
 document.getElementById('btn-new').addEventListener('click', newGame);
 document.getElementById('btn-hint').addEventListener('click', useHint);
 document.getElementById('btn-stats').addEventListener('click', () => showScreen('stats-screen'));
@@ -1134,7 +1375,7 @@ document.getElementById('btn-settings').addEventListener('click', () => {
   state.shareEmojis = [];
   showScreen('setup-screen');
 });
-
+ 
 // THEME
 let dark = localStorage.getItem('wordle_theme') === 'dark';
 function applyTheme() {
@@ -1147,17 +1388,17 @@ document.getElementById('btn-theme').addEventListener('click', () => {
   applyTheme();
 });
 applyTheme();
-
+ 
 // Close modals on overlay click
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
   overlay.addEventListener('click', e => {
     if (e.target === overlay) overlay.classList.remove('open');
   });
 });
-
+ 
 // Init
 loadState();
-
+ 
 // Pre-select saved settings in UI
 document.querySelectorAll('.opt-btn').forEach(btn => {
   const g = btn.dataset.group, v = btn.dataset.val;
@@ -1168,6 +1409,39 @@ document.querySelectorAll('.opt-btn').forEach(btn => {
     btn.classList.add('selected');
   }
 });
+ 
+// ── Перестройка сетки при изменении размера/ориентации ──
+let resizeTimer;
+function onResize() {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    if (state.word && !document.getElementById('game-screen').classList.contains('active') === false) {
+      if (document.getElementById('game-screen').classList.contains('active')) {
+        buildGrid();
+        restoreGrid();
+        updateCurrentRow();
+        buildKeyboard();
+        // Восстановить цвета клавиш
+        state.guesses.forEach(g => {
+          g.guess.split('').forEach((ch, i) => {
+            const key = document.getElementById('key-' + ch);
+            if (!key) return;
+            const cur = key.dataset.state;
+            const res = g.result[i];
+            const priority = {correct:3, present:2, absent:1};
+            if (!cur || (priority[res] || 0) > (priority[cur] || 0)) {
+              key.dataset.state = res;
+              key.classList.remove('correct','present','absent');
+              key.classList.add(res);
+            }
+          });
+        });
+      }
+    }
+  }, 150);
+}
+window.addEventListener('resize', onResize);
+window.addEventListener('orientationchange', () => setTimeout(onResize, 300));
 </script>
 </body>
 </html>
